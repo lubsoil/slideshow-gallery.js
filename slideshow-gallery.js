@@ -72,6 +72,7 @@ class SlideshowGallery {
         this.photoGalleryIntervalId = setInterval(() => this.photoGalleryInterval(), 10);
         this.canvasElement.addEventListener('mouseup', (e) => this.mouseUpEvent(this, e));
         window.addEventListener('resize', (e) => this.resizeEvent(this, e));
+        window.addEventListener('load', (e) => this.resizeEvent(this, e));
     }
 
     nextImage() {
@@ -132,8 +133,6 @@ class SlideshowGallery {
 
     resizeEvent(obj, event) {
         obj.resize(this.canvasElement.clientWidth,this.canvasElement.clientHeight)
-        console.log(obj.options.width);
-        console.log(obj.options.height)
     }
 
     mouseUpEvent(obj, event) {

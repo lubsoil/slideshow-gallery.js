@@ -13,7 +13,7 @@ class SlideshowGallery {
         if (this.options['automaticSlideshowTimer'] == undefined) {
             this.options['automaticSlideshowTimer'] = 15000;
         }
-        if(this.options['galleryButtons'] == undefined){
+        if (this.options['galleryButtons'] == undefined) {
             this.options['galleryButtons'] = {};
         }
         if (this.options.galleryButtons['prevButton'] == undefined) {
@@ -120,6 +120,13 @@ class SlideshowGallery {
         return this.images[id].loaded;
     };
 
+    resize(width, height) {
+        this.options.width = width;
+        this.options.height = height;
+        this.canvasElement.width = width;
+        this.canvasElement.height = height;
+    }
+
     mouseUpAction(obj, event) {
         const rect = this.canvasElement.getBoundingClientRect();
         const x = event.clientX - rect.left;
@@ -166,7 +173,7 @@ class SlideshowGallery {
         //DRAWING AUTOMATICSLIDESHOW BAR
         ctx.beginPath();
         ctx.fillStyle = "white";
-        ctx.fillRect(0, 448, obj.options.width * (obj.automaticSlideshow.timer / obj.options.automaticSlideshowTimer), 450);
+        ctx.fillRect(0, obj.options.height-2, obj.options.width * (obj.automaticSlideshow.timer / obj.options.automaticSlideshowTimer), obj.options.height);
         ctx.stroke();
 
         window.requestAnimationFrame(() => { obj.draw(obj); });

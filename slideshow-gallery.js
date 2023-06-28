@@ -66,7 +66,7 @@ class SlideshowGallery {
         this.canvasElement.height = this.options.height;
 
         if (this.canvasElement.getContext) {
-            window.requestAnimationFrame(() => { this.draw(this); });
+            window.requestAnimationFrame(() => { this.drawEvent(this); });
         }
 
         this.photoGalleryIntervalId = setInterval(() => this.photoGalleryInterval(), 10);
@@ -99,6 +99,9 @@ class SlideshowGallery {
         if (this.currentImage < 0) {
             this.currentImage = this.images.length - 1;
         }
+        if (this.currentImage < 0) {
+            this.currentImage = 0;
+        }
         this.automaticSlideshow.timer = 0;
     };
 
@@ -114,6 +117,10 @@ class SlideshowGallery {
 
     removeImage(id) {
         this.images.splice(id, 1);
+
+        if (this.images.length <= this.currentImage) {
+            this.currentImage = 0;
+        }
     };
 
     getImage(id) {
@@ -121,6 +128,8 @@ class SlideshowGallery {
     };
 
     isImageLoaded(id) {
+        if (this.images.length == 0) return false;
+        if (this.images.length < id) return false;
         return this.images[id].loaded;
     };
 
@@ -132,7 +141,7 @@ class SlideshowGallery {
     }
 
     resizeEvent(obj, event) {
-        obj.resize(this.canvasElement.clientWidth,this.canvasElement.clientHeight)
+        obj.resize(this.canvasElement.clientWidth, this.canvasElement.clientHeight)
     }
 
     mouseUpEvent(obj, event) {
@@ -148,7 +157,7 @@ class SlideshowGallery {
         }
     };
 
-    draw(obj) {
+    drawEvent(obj) {
 
         let ctx = obj.canvasElement.getContext("2d");
 
@@ -161,11 +170,19 @@ class SlideshowGallery {
             }
         } else {
             if (obj.moveAnimation.animationDirection == "left") {
-                ctx.drawImage(obj.getImage(obj.currentImage), 0 + obj.options.width * (1 - (obj.moveAnimation.timer / obj.moveAnimation.maxTimer)), 0, obj.options.width, obj.options.height);
-                ctx.drawImage(obj.getImage(obj.moveAnimation.previousPhotoId), 0 - obj.options.width * (obj.moveAnimation.timer / obj.moveAnimation.maxTimer), 0, obj.options.width, obj.options.height);
+                if (obj.isImageLoaded(obj.currentImage)) {
+                    ctx.drawImage(obj.getImage(obj.currentImage), 0 + obj.options.width * (1 - (obj.moveAnimation.timer / obj.moveAnimation.maxTimer)), 0, obj.options.width, obj.options.height);
+                }
+                if (obj.isImageLoaded(obj.moveAnimation.previousPhotoId)) {
+                    ctx.drawImage(obj.getImage(obj.moveAnimation.previousPhotoId), 0 - obj.options.width * (obj.moveAnimation.timer / obj.moveAnimation.maxTimer), 0, obj.options.width, obj.options.height);
+                }
             } else if (obj.moveAnimation.animationDirection == "right") {
-                ctx.drawImage(obj.getImage(obj.currentImage), 0 - obj.options.width * (1 - (obj.moveAnimation.timer / obj.moveAnimation.maxTimer)), 0, obj.options.width, obj.options.height);
-                ctx.drawImage(obj.getImage(obj.moveAnimation.previousPhotoId), 0 + obj.options.width * (obj.moveAnimation.timer / obj.moveAnimation.maxTimer), 0, obj.options.width, obj.options.height);
+                if (obj.isImageLoaded(obj.currentImage)) {
+                    ctx.drawImage(obj.getImage(obj.currentImage), 0 - obj.options.width * (1 - (obj.moveAnimation.timer / obj.moveAnimation.maxTimer)), 0, obj.options.width, obj.options.height);
+                }
+                if (obj.isImageLoaded(obj.moveAnimation.previousPhotoId)) {
+                    ctx.drawImage(obj.getImage(obj.moveAnimation.previousPhotoId), 0 + obj.options.width * (obj.moveAnimation.timer / obj.moveAnimation.maxTimer), 0, obj.options.width, obj.options.height);
+                }
             }
         }
 
@@ -181,10 +198,10 @@ class SlideshowGallery {
         //DRAWING AUTOMATICSLIDESHOW BAR
         ctx.beginPath();
         ctx.fillStyle = "white";
-        ctx.fillRect(0, obj.options.height-2, obj.options.width * (obj.automaticSlideshow.timer / obj.options.automaticSlideshowTimer), obj.options.height);
+        ctx.fillRect(0, obj.options.height - 2, obj.options.width * (obj.automaticSlideshow.timer / obj.options.automaticSlideshowTimer), obj.options.height);
         ctx.stroke();
 
-        window.requestAnimationFrame(() => { obj.draw(obj); });
+        window.requestAnimationFrame(() => { obj.drawEvent(obj); });
     };
 
     photoGalleryInterval() {

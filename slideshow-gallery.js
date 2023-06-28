@@ -4,10 +4,10 @@ function SlideshowGallery(canvasId, images, options = {}) {
 
     //GENERATING OPTIONS VALUE IF NOT CREATED
     if (this.options['width'] == undefined) {
-        this.options['width'] = 800;
+        this.options['width'] = this.canvasElement.width;
     }
     if (this.options['height'] == undefined) {
-        this.options['height'] = 450;
+        this.options['height'] = this.canvasElement.height;
     }
     if (this.options['automaticSlideshowTimer'] == undefined) {
         this.options['automaticSlideshowTimer'] = 15000;

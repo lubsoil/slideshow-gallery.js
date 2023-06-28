@@ -20,7 +20,7 @@ function SlideshowGallery(canvasId, images, options = {}) {
     }
 
     //NEXT PHOTO FUNCTION
-    this.nextPhoto = function () {
+    this.nextImage = function () {
 
         this.moveAnimation.previousPhotoId = this.currentImage * 1;
         this.moveAnimation.enabled = true;
@@ -36,7 +36,7 @@ function SlideshowGallery(canvasId, images, options = {}) {
     }
 
     //PREVIOUS PHOTO FUNCTION
-    this.prevPhoto = function () {
+    this.prevImage = function () {
 
         this.moveAnimation.previousPhotoId = this.currentImage * 1;
         this.moveAnimation.enabled = true;
@@ -50,15 +50,43 @@ function SlideshowGallery(canvasId, images, options = {}) {
         this.automaticSlideshow.timer = 0;
     }
 
+    this.addImage = function(imgSrc){
+        var imageObject = {
+            image: new Image(),
+            loaded: false
+        }
+        imageObject.image.src = imgSrc;
+        imageObject.image.addEventListener(
+            "load",
+            () => {
+                imageObject.loaded = true;
+            },
+            false
+        );
+        this.images.push(imageObject);
+    }
+    
+    this.removeImage = function(id){
+        this.images.splice(id,1);
+    }
+
+    this.getImage = function(id){
+        return this.images[id].image;
+    }
+
+    this.isImageLoaded = function(id){
+        return this.images[id].loaded;
+    }
+
     //MOUSE RELEASED ACTION FUNCTION
     this.clickAction = function (obj, event) {
         const rect = this.canvasElement.getBoundingClientRect()
         const x = event.clientX - rect.left
         const y = event.clientY - rect.top
         if (x >= 0 && x <= (obj.leftButtonImage.width) && y >= (this.options.height / 2) - (obj.leftButtonImage.height / 2) && y <= (this.options.height / 2) + (obj.leftButtonImage.height / 2)) {
-            this.prevPhoto();
+            this.prevImage();
         } else if (x >= this.options.width - (obj.rightButtonImage.width) && x <= this.options.width && y >= (this.options.height / 2) - (obj.rightButtonImage.height / 2) && y <= (this.options.height / 2) + (obj.rightButtonImage.height / 2)) {
-            this.nextPhoto();
+            this.nextImage();
         } else {
             this.automaticSlideshow.paused = !this.automaticSlideshow.paused;
         }
@@ -66,37 +94,40 @@ function SlideshowGallery(canvasId, images, options = {}) {
 
     //DRAW EVENT
     this.draw = function (obj) {
-        obj.ctx.clearRect(0, 0, obj.options.width, obj.options.height);
+
+        let ctx = obj.canvasElement.getContext("2d");
+
+        ctx.clearRect(0, 0, obj.options.width, obj.options.height);
 
         //DRAWING PICTURE OR ANIMATION
         if (obj.moveAnimation.enabled == false) {
-            if (obj.images.length > obj.currentImage && obj.currentImage >= 0 && obj.loadedImages[obj.currentImage] == true) {
-                obj.ctx.drawImage(obj.images[obj.currentImage], 0, 0, obj.options.width, obj.options.height);
+            if (obj.images.length > obj.currentImage && obj.currentImage >= 0 && obj.isImageLoaded(obj.currentImage)) {
+                ctx.drawImage(obj.getImage(obj.currentImage), 0, 0, obj.options.width, obj.options.height);
             }
         } else {
             if (obj.moveAnimation.animationDirection == "left") {
-                obj.ctx.drawImage(obj.images[obj.currentImage], 0 + obj.options.width * (1 - (obj.moveAnimation.timer / obj.moveAnimation.maxTimer)), 0, obj.options.width, obj.options.height);
-                obj.ctx.drawImage(obj.images[obj.moveAnimation.previousPhotoId], 0 - obj.options.width * (obj.moveAnimation.timer / obj.moveAnimation.maxTimer), 0, obj.options.width, obj.options.height);
+                ctx.drawImage(obj.getImage(obj.currentImage), 0 + obj.options.width * (1 - (obj.moveAnimation.timer / obj.moveAnimation.maxTimer)), 0, obj.options.width, obj.options.height);
+                ctx.drawImage(obj.getImage(obj.moveAnimation.previousPhotoId), 0 - obj.options.width * (obj.moveAnimation.timer / obj.moveAnimation.maxTimer), 0, obj.options.width, obj.options.height);
             } else if (obj.moveAnimation.animationDirection == "right") {
-                obj.ctx.drawImage(obj.images[obj.currentImage], 0 - obj.options.width * (1 - (obj.moveAnimation.timer / obj.moveAnimation.maxTimer)), 0, obj.options.width, obj.options.height);
-                obj.ctx.drawImage(obj.images[obj.moveAnimation.previousPhotoId], 0 + obj.options.width * (obj.moveAnimation.timer / obj.moveAnimation.maxTimer), 0, obj.options.width, obj.options.height);
+                ctx.drawImage(obj.getImage(obj.currentImage), 0 - obj.options.width * (1 - (obj.moveAnimation.timer / obj.moveAnimation.maxTimer)), 0, obj.options.width, obj.options.height);
+                ctx.drawImage(obj.getImage(obj.moveAnimation.previousPhotoId), 0 + obj.options.width * (obj.moveAnimation.timer / obj.moveAnimation.maxTimer), 0, obj.options.width, obj.options.height);
             }
         }
 
         //DRAWING BUTTONS
         if (obj.leftButtonImageLoaded) {
-            obj.ctx.drawImage(obj.leftButtonImage, 0, (obj.options.height / 2) - (obj.leftButtonImage.height / 2));
+            ctx.drawImage(obj.leftButtonImage, 0, (obj.options.height / 2) - (obj.leftButtonImage.height / 2));
         }
 
         if (obj.rightButtonImage) {
-            obj.ctx.drawImage(obj.rightButtonImage, obj.options.width - (obj.leftButtonImage.width), (obj.options.height / 2) - (obj.rightButtonImage.height / 2));
+            ctx.drawImage(obj.rightButtonImage, obj.options.width - (obj.leftButtonImage.width), (obj.options.height / 2) - (obj.rightButtonImage.height / 2));
         }
 
         //DRAWING AUTOMATICSLIDESHOW BAR
-        obj.ctx.beginPath();
-        obj.ctx.fillStyle = "white";
-        obj.ctx.fillRect(0, 448, obj.options.width * (obj.automaticSlideshow.timer / obj.options.automaticSlideshowTimer), 450);
-        obj.ctx.stroke();
+        ctx.beginPath();
+        ctx.fillStyle = "white";
+        ctx.fillRect(0, 448, obj.options.width * (obj.automaticSlideshow.timer / obj.options.automaticSlideshowTimer), 450);
+        ctx.stroke();
 
         window.requestAnimationFrame(() => { obj.draw(obj) });
     }
@@ -105,7 +136,7 @@ function SlideshowGallery(canvasId, images, options = {}) {
         if (this.options.automaticSlideshowTimer > 0 && this.moveAnimation.enabled == false && this.automaticSlideshow.paused == false) {
             this.automaticSlideshow.timer += 10;
             if (this.automaticSlideshow.timer >= this.options.automaticSlideshowTimer) {
-                this.nextPhoto();
+                this.nextImage();
             }
         }
         if (this.moveAnimation.enabled == true) {
@@ -123,19 +154,7 @@ function SlideshowGallery(canvasId, images, options = {}) {
         this.currentImage = 0;
 
         images.forEach(imgSrc => {
-            var currentImg = new Image();
-            var currentId = this.images.length;
-
-            currentImg.src = imgSrc;
-            this.images.push(currentImg);
-            this.loadedImages.push(false);
-            currentImg.addEventListener(
-                "load",
-                () => {
-                    this.loadedImages[currentId] = true;
-                },
-                false
-            );
+            this.addImage(imgSrc);
         });
 
         this.leftButtonImage = new Image();
@@ -163,7 +182,6 @@ function SlideshowGallery(canvasId, images, options = {}) {
         this.canvasElement.height = this.options.height;
 
         if (this.canvasElement.getContext) {
-            this.ctx = this.canvasElement.getContext("2d");
             window.requestAnimationFrame(() => { this.draw(this) });
         }
 

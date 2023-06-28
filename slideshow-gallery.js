@@ -3,12 +3,14 @@ class SlideshowGallery {
         this.canvasElement = document.getElementById(canvasId);
         this.options = options;
 
+        let canvasStyle = window.getComputedStyle(this.canvasElement);
+
         //GENERATING OPTIONS VALUE IF NOT CREATED
         if (this.options['width'] == undefined) {
-            this.options['width'] = this.canvasElement.width;
+            this.options['width'] = this.canvasElement.clientWidth;
         }
         if (this.options['height'] == undefined) {
-            this.options['height'] = this.canvasElement.height;
+            this.options['height'] = this.canvasElement.clientHeight;
         }
         if (this.options['automaticSlideshowTimer'] == undefined) {
             this.options['automaticSlideshowTimer'] = 15000;
@@ -68,7 +70,8 @@ class SlideshowGallery {
         }
 
         this.photoGalleryIntervalId = setInterval(() => this.photoGalleryInterval(), 10);
-        this.canvasElement.addEventListener('mouseup', (e) => this.mouseUpAction(this, e));
+        this.canvasElement.addEventListener('mouseup', (e) => this.mouseUpEvent(this, e));
+        window.addEventListener('resize', (e) => this.resizeEvent(this, e));
     }
 
     nextImage() {
@@ -127,7 +130,13 @@ class SlideshowGallery {
         this.canvasElement.height = height;
     }
 
-    mouseUpAction(obj, event) {
+    resizeEvent(obj, event) {
+        obj.resize(this.canvasElement.clientWidth,this.canvasElement.clientHeight)
+        console.log(obj.options.width);
+        console.log(obj.options.height)
+    }
+
+    mouseUpEvent(obj, event) {
         const rect = this.canvasElement.getBoundingClientRect();
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;

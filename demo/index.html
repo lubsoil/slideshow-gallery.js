@@ -9,7 +9,12 @@
 
         div {
             margin: auto;
-            width: 800px;
+            max-width: 800px;
+        }
+
+        canvas {
+            width:100%;
+            height:auto;
         }
     </style>
 </head>
@@ -17,7 +22,7 @@
 <body style="background-color: gainsboro;">
     <h1>Slideshow Gallery</h1>
     <div>
-        <canvas id="slideshowCanvas" width="800px" height="450px"></canvas>
+        <canvas id="slideshowCanvas"></canvas>
     </div>
     <script>
         const slideshowGallery = new SlideshowGallery("slideshowCanvas", ["image1.png", "image2.png", "image3.png", "image4.png"]);

@@ -1,23 +1,27 @@
 <!DOCTYPE html>
-    <head>
-        <script src="../slideshow-gallery.js"></script>
-        <style>
-            h1{
-                text-align: center;
-            }
-            div{
-                margin: auto; 
-                width: 800px;
-            }
-        </style>
-    </head>
-    <body style="background-color: gainsboro;">
-        <h1>Slideshow Gallery</h1>
-        <div>
-            <canvas id="slideshowCanvas"></canvas>
-        </div>
-        <script>
-            const slideshowGallery = new SlideshowGallery("slideshowCanvas",["image1.png","image2.png","image3.png","image4.png"]);
-        </script>
-    </body>
+
+<head>
+    <script src="../slideshow-gallery.js"></script>
+    <style>
+        h1 {
+            text-align: center;
+        }
+
+        div {
+            margin: auto;
+            width: 800px;
+        }
+    </style>
+</head>
+
+<body style="background-color: gainsboro;">
+    <h1>Slideshow Gallery</h1>
+    <div>
+        <canvas id="slideshowCanvas"></canvas>
+    </div>
+    <script>
+        const slideshowGallery = new SlideshowGallery("slideshowCanvas", ["image1.png", "image2.png", "image3.png", "image4.png"]);
+    </script>
+</body>
+
 </html>
